@@ -5,6 +5,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
+/**
+ * Версия схемы Room (`version`) отвечает ТОЛЬКО за структуру таблиц. Обновление
+ * контента (seed.json) НЕ должно её менять — для этого есть [Repository.CONTENT_VERSION],
+ * которая пересевает лишь таблицы контента, сохраняя прогресс/профиль/покупки.
+ *
+ * Поэтому `version` заморожена на 23. Бампить её нужно лишь при РЕАЛЬНОЙ смене схемы
+ * (новые поля/таблицы) — и тогда добавлять `addMigrations(...)`, а не полагаться на
+ * деструктивный fallback (он оставлен лишь как аварийная страховка на время pre-release).
+ */
 @Database(
     entities = [
         ThemeEntity::class,

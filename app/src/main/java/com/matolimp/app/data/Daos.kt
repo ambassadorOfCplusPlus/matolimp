@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -40,6 +41,31 @@ interface ContentDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProblems(items: List<ProblemEntity>)
+
+    // ── Пересев контента (обновление seed.json) — НЕ трогает прогресс/профиль/покупки ──
+    @Query("DELETE FROM problems")
+    suspend fun clearProblems()
+
+    @Query("DELETE FROM subthemes")
+    suspend fun clearSubthemes()
+
+    @Query("DELETE FROM themes")
+    suspend fun clearThemes()
+
+    /** Атомарно заменяет весь контент (темы/подтемы/задачи) в одной транзакции. */
+    @Transaction
+    suspend fun replaceContent(
+        themes: List<ThemeEntity>,
+        subs: List<SubthemeEntity>,
+        probs: List<ProblemEntity>
+    ) {
+        clearProblems()
+        clearSubthemes()
+        clearThemes()
+        insertThemes(themes)
+        insertSubthemes(subs)
+        insertProblems(probs)
+    }
 }
 
 @Dao

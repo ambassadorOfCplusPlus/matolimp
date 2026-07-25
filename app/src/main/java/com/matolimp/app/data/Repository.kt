@@ -28,10 +28,21 @@ class Repository(
     suspend fun theme(id: String): ThemeEntity? = contentDao.theme(id)
     suspend fun progressFor(id: String): ProgressEntity? = progressDao.get(id)
 
-    /** Однократный сид контента из assets/seed.json при первом запуске. */
+    /**
+     * Сид/обновление контента из assets/seed.json.
+     *
+     * Версия контента (CONTENT_VERSION) разведена с версией схемы Room: при обновлении
+     * задач/теории поднимаем ТОЛЬКО CONTENT_VERSION — тогда пересеваются лишь таблицы
+     * контента (темы/подтемы/задачи), а прогресс, профиль, серии, покупки и AI-кэш
+     * остаются нетронутыми. Версию схемы Room бампим лишь при реальной смене схемы.
+     */
     suspend fun seedIfNeeded() {
         if (progressDao.profile() == null) progressDao.upsertProfile(ProfileEntity())
-        if (contentDao.themeCount() > 0) return
+
+        val prefs = appContext.getSharedPreferences(META_PREFS, Context.MODE_PRIVATE)
+        val seededVersion = prefs.getInt(KEY_CONTENT_VERSION, 0)
+        val empty = contentDao.themeCount() == 0
+        if (!empty && seededVersion == CONTENT_VERSION) return
 
         val text = appContext.assets.open("seed.json").bufferedReader().use { it.readText() }
         val root = json.decodeFromString<SeedRoot>(text)
@@ -60,9 +71,9 @@ class Repository(
                 }
             }
         }
-        contentDao.insertThemes(themes)
-        contentDao.insertSubthemes(subs)
-        contentDao.insertProblems(probs)
+        // Атомарная замена контента; прогресс/профиль/покупки в других таблицах не затрагиваются.
+        contentDao.replaceContent(themes, subs, probs)
+        prefs.edit().putInt(KEY_CONTENT_VERSION, CONTENT_VERSION).apply()
     }
 
     data class ClosedResult(
@@ -154,6 +165,17 @@ class Repository(
                 onboarded = true
             )
         )
+    }
+
+    companion object {
+        /**
+         * Версия контента (seed.json). Поднимай при КАЖДОМ обновлении задач/теории —
+         * тогда контент пересеется, а прогресс/покупки сохранятся. Версию схемы Room
+         * (AppDatabase.version) при этом НЕ трогай.
+         */
+        const val CONTENT_VERSION = 1
+        private const val META_PREFS = "matolimp_meta"
+        private const val KEY_CONTENT_VERSION = "content_version"
     }
 
     private suspend fun addXp(delta: Int) {
