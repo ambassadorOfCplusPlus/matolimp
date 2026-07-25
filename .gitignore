@@ -1,0 +1,39 @@
+# ── Secrets / local config ──
+local.properties
+**/local.properties
+*.keystore
+*.jks
+.env
+.env.*
+!.env.example
+
+# ── Android / Gradle ──
+.gradle/
+build/
+/build
+app/build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# ── Kotlin ──
+.kotlin/
+
+# ── IDE ──
+.idea/
+*.iml
+.DS_Store
+*.log
+
+# ── Node / web ──
+node_modules/
+web/dist/
+web/.vite/
+.vercel/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
