@@ -173,7 +173,7 @@ class Repository(
          * тогда контент пересеется, а прогресс/покупки сохранятся. Версию схемы Room
          * (AppDatabase.version) при этом НЕ трогай.
          */
-        const val CONTENT_VERSION = 2
+        const val CONTENT_VERSION = 3
         private const val META_PREFS = "matolimp_meta"
         private const val KEY_CONTENT_VERSION = "content_version"
     }
