@@ -18,6 +18,7 @@ const THEME_META = {
   algebra:      { icon: '𝑥', color: '#4263eb' },
   'prep-muni':  { icon: '🏙️', color: '#0ca678' },
   'prep-region':{ icon: '🗺️', color: '#5c7cfa' },
+  'prep-final': { icon: '🏆', color: '#e8b923' },
 }
 
 export function themeMeta(id) {

@@ -6,9 +6,10 @@ export default function Razbor() {
   const { content } = useApp()
   const region = content.themeById.get('prep-region')
   const muni = content.themeById.get('prep-muni')
+  const final = content.themeById.get('prep-final')
 
   const [stage, setStage] = useState('region')
-  const theme = stage === 'region' ? region : muni
+  const theme = stage === 'region' ? region : stage === 'muni' ? muni : final
   const years = useMemo(() => {
     const ys = (theme?.subthemes || []).filter((s) => s.problems.length)
     return ys
@@ -34,10 +35,12 @@ export default function Razbor() {
       <p className="muted">Выбери этап и год — каждая задача тура разобрана и классифицирована по приёму.</p>
 
       <div className="seg">
-        <button className={'seg-btn' + (stage === 'region' ? ' on' : '')}
-          onClick={() => { setStage('region'); setSubId(null); setPattern(null) }}>Региональный</button>
         <button className={'seg-btn' + (stage === 'muni' ? ' on' : '')}
           onClick={() => { setStage('muni'); setSubId(null); setPattern(null) }}>Муниципальный</button>
+        <button className={'seg-btn' + (stage === 'region' ? ' on' : '')}
+          onClick={() => { setStage('region'); setSubId(null); setPattern(null) }}>Региональный</button>
+        <button className={'seg-btn' + (stage === 'final' ? ' on' : '')}
+          onClick={() => { setStage('final'); setSubId(null); setPattern(null) }}>Заключительный</button>
       </div>
 
       <div className="chips">
@@ -51,7 +54,7 @@ export default function Razbor() {
       {sub && (
         <>
           <div className="razbor-head">
-            <h2>{sub.title} · {stage === 'region' ? 'региональный' : 'муниципальный'} этап</h2>
+            <h2>{sub.title} · {stage === 'region' ? 'региональный' : stage === 'muni' ? 'муниципальный' : 'заключительный'} этап</h2>
             <span className="muted">{sub.problems.length} задач</span>
           </div>
 
