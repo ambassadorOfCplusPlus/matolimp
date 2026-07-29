@@ -1,4 +1,8 @@
 // Загрузка и индексация контента из того же seed.json, что и Android.
+// seed.json импортируется через ?url — Vite добавляет хэш в имя файла,
+// поэтому обновление контента гарантированно сбрасывает кэш у пользователей.
+import seedUrl from '../seed.json?url'
+
 let _cache = null
 
 const THEME_META = {
@@ -28,7 +32,7 @@ export function themeMeta(id) {
 
 export async function loadContent() {
   if (_cache) return _cache
-  const res = await fetch(import.meta.env.BASE_URL + 'seed.json')
+  const res = await fetch(seedUrl)
   if (!res.ok) throw new Error('Не удалось загрузить контент')
   const data = await res.json()
   const themes = (data.themes || []).slice().sort((a, b) => (a.order || 0) - (b.order || 0))
