@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useApp } from '../lib/context.js'
 import { checkAnswer, answerHint } from '../lib/answer.js'
 import MathText from '../components/MathText.jsx'
-import { DifficultyBadge, KindTag, PatternChip } from '../components/UI.jsx'
+import { DifficultyBadge, KindTag, PatternChip, SolveStats } from '../components/UI.jsx'
 
 const MAX_ATTEMPTS = 3
 
@@ -74,6 +74,8 @@ export default function ProblemPage() {
       <div className="statement card">
         <MathText>{problem.statement}</MathText>
       </div>
+
+      <SolveStats stats={problem.stats} />
 
       {problem.kind === 'CLOSED' ? (
         <div className="answer-block">

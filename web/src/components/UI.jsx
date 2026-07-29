@@ -42,6 +42,52 @@ export function ProgressRing({ value, size = 46, stroke = 5, label }) {
   )
 }
 
+// Цвет по решаемости: много решило → зелёный (легко), мало → красный (сложно)
+function solveColor(p) {
+  if (p >= 0.6) return '#12b886'
+  if (p >= 0.3) return '#f59f00'
+  return '#e64980'
+}
+
+// Компактный бейдж решаемости для карточки
+export function SolveBadge({ stats }) {
+  if (!stats || stats.solved == null) return null
+  const pct = Math.round(stats.solved * 100)
+  return (
+    <span className="solve-badge" style={{ '--sc': solveColor(stats.solved) }}
+      title={`${pct}% участников решили полностью${stats.n ? ` (из ${stats.n})` : ''}`}>
+      <span className="solve-dot" /> {pct}% решили
+    </span>
+  )
+}
+
+// Развёрнутый блок статистики для экрана задачи
+export function SolveStats({ stats }) {
+  if (!stats || stats.solved == null) return null
+  const pct = Math.round(stats.solved * 100)
+  const zero = stats.zero != null ? Math.round(stats.zero * 100) : null
+  return (
+    <div className="solvestats card" style={{ '--sc': solveColor(stats.solved) }}>
+      <div className="solvestats-head">
+        <span className="solvestats-title">Реальная решаемость</span>
+        {stats.clsRu && <span className="solvestats-cls">{stats.clsRu}</span>}
+      </div>
+      <div className="solvestats-bar"><span style={{ width: `${pct}%` }} /></div>
+      <div className="solvestats-nums">
+        <b style={{ color: 'var(--sc)' }}>{pct}%</b> решили полностью
+        {zero != null && <span className="muted"> · {zero}% написали на ноль</span>}
+        {stats.n != null && <span className="muted"> · участников: {stats.n}</span>}
+        {stats.disc != null && <span className="muted"> · дискриминация {stats.disc}</span>}
+      </div>
+      {stats.source && (
+        <div className="muted small solvestats-src">
+          Статистика по опубликованным результатам · источник: {stats.source}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function StatusDot({ id }) {
   const { state } = useApp()
   const st = state.solved[id]?.status
@@ -76,7 +122,10 @@ export function ProblemCard({ problem, index }) {
         <span className="pcard-diff"><DifficultyBadge value={problem.difficulty} /></span>
       </div>
       <div className="pcard-body">{plainPreview(problem.statement)}</div>
-      {problem.pattern && <PatternChip pattern={problem.pattern} />}
+      <div className="pcard-foot">
+        {problem.pattern && <PatternChip pattern={problem.pattern} />}
+        <SolveBadge stats={problem.stats} />
+      </div>
     </Link>
   )
 }

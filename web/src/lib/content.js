@@ -19,6 +19,7 @@ const THEME_META = {
   'prep-muni':  { icon: '🏙️', color: '#0ca678' },
   'prep-region':{ icon: '🗺️', color: '#5c7cfa' },
   'prep-final': { icon: '🏆', color: '#e8b923' },
+  'tournament-towns': { icon: '🏙️', color: '#e8590c' },
 }
 
 export function themeMeta(id) {
